@@ -1,30 +1,11 @@
 import React from 'react';
-import { useFormik } from 'formik';
-import { useHistory } from 'react-router-dom';
+
 import { Form, Button } from 'react-bootstrap';
 import Input from './Input';
-import api from '../services/api';
 
-const SignIn = () => {
-  const history = useHistory();
-  const formik = useFormik({
-    initialValues: {
-      cpf: '',
-      password: '',
-    },
-    onSubmit: async values => {
-      try {
-        const token = await api.post('/sessionsUser', values);
-        console.log(token);
-        history.push('/userAppointment');
-      } catch (err) {
-        console.log(err);
-      }
-    },
-  });
-
+const SignIn = ({ password, cpf, onSubmit, handleChange }) => {
   return (
-    <Form onSubmit={formik.handleSubmit}>
+    <Form onSubmit={onSubmit}>
       <Input
         id="cpf"
         as="input"
@@ -32,8 +13,8 @@ const SignIn = () => {
         type="number"
         placeholder="Insira o cpf"
         label="CPF"
-        value={formik.values.cpf}
-        onChange={formik.handleChange}
+        value={cpf}
+        onChange={handleChange}
       />
 
       <Input
@@ -41,8 +22,8 @@ const SignIn = () => {
         type="password"
         placeholder="Insira a senha"
         label="Senha"
-        value={formik.values.password}
-        onChange={formik.handleChange}
+        value={password}
+        onChange={handleChange}
       />
 
       <Button variant="primary" type="submit">
