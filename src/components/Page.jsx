@@ -3,8 +3,8 @@ import { Container, Card } from 'react-bootstrap';
 
 const Page = ({ title, children }) => {
   return (
-    <Container>
-      <Card>
+    <Container fluid>
+      <Card className="mt-10">
         <Card.Header>
           <Card.Title>{title}</Card.Title>
         </Card.Header>
