@@ -47,7 +47,7 @@ const AuthProvider = ({ children }) => {
 
     setData({});
   };
-  console.log(data);
+
   return (
     <>
       {data.token ? (
