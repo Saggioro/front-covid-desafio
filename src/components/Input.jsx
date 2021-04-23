@@ -1,17 +1,16 @@
 import React from 'react';
 import { Form, Col } from 'react-bootstrap';
 
-const Input = ({ label, id, children, sm = '2', ...rest }) => {
+const Input = ({ label, id, children, error, ...rest }) => {
   return (
-    <Form.Group>
-      <Col sm={sm}>
-        <Form.Label htmlFor={id}>{label}</Form.Label>
+    <Col className="pl-0" xs={12} sm={6} md={5} lg={4} xl={3}>
+      <Form.Group controlId={id}>
+        <Form.Label>{label}</Form.Label>
 
-        <Form.Control id={id} {...rest}>
-          {children}
-        </Form.Control>
-      </Col>
-    </Form.Group>
+        <Form.Control {...rest}>{children}</Form.Control>
+        <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>
+      </Form.Group>
+    </Col>
   );
 };
 
