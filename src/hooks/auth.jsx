@@ -21,10 +21,10 @@ const AuthProvider = ({ children }) => {
 
         return {};
       }
-      const { birth } = decoded;
+      const { birth, name } = decoded;
 
       api.defaults.headers.authorization = `Bearer ${token}`;
-      return { token, birth };
+      return { token, birth, name };
     }
 
     return {};
@@ -33,12 +33,12 @@ const AuthProvider = ({ children }) => {
   const signIn = async ({ cpf, password }) => {
     const response = await api.post('/sessionsUser', { cpf, password });
 
-    const { birth } = jwt.decode(response.data.token);
+    const { birth, name } = jwt.decode(response.data.token);
 
     api.defaults.headers.authorization = `Bearer ${response.data.token}`;
     localStorage.setItem('@Agendacovid:token', response.data.token);
 
-    setData({ token: response.data.token, birth });
+    setData({ token: response.data.token, birth, name });
   };
 
   const signOut = () => {
@@ -51,11 +51,13 @@ const AuthProvider = ({ children }) => {
   return (
     <>
       {data.token ? (
-        <AuthContext.Provider value={{ birth: data.birth, signIn, signOut }}>
+        <AuthContext.Provider
+          value={{ name: data.name, birth: data.birth, signIn, signOut }}
+        >
           {children}
         </AuthContext.Provider>
       ) : (
-        <AuthContext.Provider value={{ birth: '', signIn, signOut }}>
+        <AuthContext.Provider value={{ name: '', birth: '', signIn, signOut }}>
           {children}
         </AuthContext.Provider>
       )}
