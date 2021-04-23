@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Form } from 'react-bootstrap';
+import { Form, Button, Spinner } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
-
+import { useFormik } from 'formik';
 import ptBR from 'date-fns/locale/pt-BR';
-
+import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { isEqual, parseISO, startOfDay, format } from 'date-fns';
 
@@ -12,9 +12,30 @@ import Page from '../../components/Page';
 import api from '../../services/api';
 
 const UserAppointment = () => {
+  const [loading, setLoading] = useState(false);
   const [start, setStart] = useState(new Date());
   const [dates, setDates] = useState([]);
   const [schedules, setSchedules] = useState([]);
+  const history = useHistory();
+
+  const formik = useFormik({
+    initialValues: {
+      date: '',
+    },
+    onSubmit: async values => {
+      setLoading(true);
+      try {
+        const formated = format(new Date(values.date), 'yyyy-MM-dd HH:mm');
+
+        await api.post('/appointments', { date: formated });
+        toast.success('Agendamento realizado com sucesso!');
+        history.push('/userDashboard');
+      } catch (err) {
+        toast.error(err?.response?.data?.message);
+      }
+      setLoading(false);
+    },
+  });
 
   const getAppointments = async () => {
     try {
@@ -24,7 +45,10 @@ const UserAppointment = () => {
       setSchedules(response.data);
       setDates(data);
     } catch (err) {
-      toast.error(err?.response?.data?.message);
+      toast.error(
+        err?.response?.data?.message ||
+          'Parece que estamos com um problema em nossos servidores :(',
+      );
     }
   };
 
@@ -32,9 +56,9 @@ const UserAppointment = () => {
     getAppointments();
   }, []);
   return (
-    <Page title="Agendamento">
+    <Page title="Agendamento" logOut>
       {dates.length > 0 ? (
-        <Form>
+        <Form onSubmit={formik.handleSubmit}>
           <Form.Text sm="2">Selecione um dia:</Form.Text>
           <DatePicker
             className="mb-3"
@@ -44,7 +68,13 @@ const UserAppointment = () => {
             onChange={date => setStart(date)}
             includeDates={dates}
           />
-          <Input id="hoursSelect" label="Selecione o horário:" as="select">
+          <Input
+            id="date"
+            label="Selecione o horário:"
+            as="select"
+            value={formik.values.date}
+            onChange={formik.handleChange}
+          >
             <option value="">Escolha um horário...</option>
             {schedules
               .find(schedule =>
@@ -58,9 +88,12 @@ const UserAppointment = () => {
                 );
               })}
           </Input>
+          <Button disable={loading} type="submit">
+            {loading ? <Spinner size="sm" animation="border" /> : 'Agendar'}
+          </Button>
         </Form>
       ) : (
-        <h1>Loading</h1>
+        <Spinner animation="border" />
       )}
     </Page>
   );
